@@ -1,0 +1,103 @@
+---
+title: "scRNA-seq data analysis report_CC_sc01_01"
+author: "Chang Yin"
+date: "2025-03-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Datasets information
+
+In this analysis, original row counts matrix are come from the mapping and counting results by using the 10X Genomics cellranger tools.
+Including:
+* Control
+* mud
+* nanobody
+
+## Quality Control Process
+1. Genes/cell > 500 genes
+2. UMIs/cell > 1000 counts
+3. log(genes)/log(UMIs) > 0.8
+4. Mitochondrial genes proportion <= 18%
+5. Ribosomal genes proportion >= 5% & =< 40%
+6. Heat shock genes proportion <= 5%
+7. Only keep genes have UMIs >= 2
+8. Only keep genes at least express in 2 cells
+9. Remove doublets
+
+```{r loading_datasets}
+seurat_control_singlet <- readRDS("/home/rstudio/Projects/Clemens_sc_202502/Outputs/seurat_control_singlet.rds")
+seurat_mud_singlet <- readRDS("/home/rstudio/Projects/Clemens_sc_202502/Outputs/seurat_mud_singlet.rds")
+seurat_nanobody_singlet <- readRDS("/home/rstudio/Projects/Clemens_sc_202502/Outputs/seurat_nanobody_singlet.rds")
+```
+```{r}
+library(Seurat)
+```
+
+## Final Outputs after QC
+#### control
+For the control dataset: after the qc filtering, it remains 10,202 genes and 13,475 single cells
+```{r control}
+dim(seurat_control_singlet)
+```
+
+clustering into 34 clusters: c0-c33
+```{r control_UMAP}
+DimPlot(seurat_control_singlet, reduction = "umap", label = TRUE)
+```
+
+some genes expression patterns
+```{r control_features}
+FeaturePlot(seurat_control_singlet, features = c("nSyb", "numb", "esg", "pros"), label = TRUE)
+```
+
+
+#### mud
+For the mud dataset: after the qc filtering, it remains 10,375 genes and 13,914 single cells
+```{r mud}
+dim(seurat_mud_singlet)
+```
+
+clustering into 35 clusters: c0-c34
+```{r mud_UMAP}
+DimPlot(seurat_mud_singlet, reduction = "umap", label = TRUE)
+```
+
+some genes expression patterns
+```{r mud_features}
+FeaturePlot(seurat_mud_singlet, features = c("nSyb", "numb", "esg", "pros"), label = TRUE)
+```
+
+
+#### nanobody
+For the nanobody dataset: after the qc filtering, it remains 10,366 genes and 13,262 single cells
+```{r nanobody}
+dim(seurat_nanobody_singlet)
+```
+
+clustering into 35 clusters: c0-c34
+```{r nanobody_UMAP}
+DimPlot(seurat_nanobody_singlet, reduction = "umap", label = TRUE)
+```
+
+some genes expression patterns
+```{r nanobody_features}
+FeaturePlot(seurat_nanobody_singlet, features = c("nSyb", "numb", "esg", "pros"), label = TRUE)
+```
+
+### Next Steps:
+1. Annotation: 
+* Please review the marker gene list, highlight the genes that are highly interested in or highly related.
+* Any other marker genes based on publications and references
+2. cell-cycle analysis
+* current gene list related to cell cycle
+* any other genes need to be added
+3. Differentially expressed genes identification
+* Integrate 3 datasets 
+* Perform the DE analysis
+    * control vs. mud
+    * control vs. nanobody
+4. Pseudotime analysis
